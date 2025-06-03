@@ -102,14 +102,19 @@
         libcap; \
       setcap 'cap_net_bind_service=+ep' "/usr/local/bin/python${PYTHON_VERSION}"; \
       apk del --no-network .build;
-      
+
+    RUN set -ex; \
+      # CVE-2025-43859
+      pip3 install h11 --upgrade; \
+      # CVE-2024-28397
+      pip3 install js2py --upgrade;
 
 # :: PERSISTENT DATA
   VOLUME ["${APP_ROOT}/etc"]
 
 # :: HEALTH
   HEALTHCHECK --interval=5s --timeout=2s --start-interval=5s \
-    CMD ["/usr/bin/curl", "-kILs", "--fail", "http://localhost:3000/"]
+    CMD ["/usr/bin/curl", "-X", "GET", "-kILs", "--fail", "http://localhost:3000/"]
 
 # :: EXECUTE
   USER ${APP_UID}:${APP_GID}

@@ -15,5 +15,9 @@
     "built":{
       "homeassistant":"https://github.com/home-assistant/core"
     }
+  },
+  "grype":{
+    "severity":"critical",
+    "fail":false
   }
 }

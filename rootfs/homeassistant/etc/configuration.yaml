@@ -26,6 +26,6 @@ recorder:
   db_url: !secret postgresuri
 
 logger:
-  default: error
+  default: critical
   logs:
-    homeassistant.core: error
+    homeassistant.core: fatal

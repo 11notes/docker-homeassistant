@@ -37,6 +37,7 @@ services:
         condition: "service_healthy"
         restart: true
     image: "11notes/homeassistant:2025.5.3"
+    read_only: true
     environment:
       TZ: "Europe/Zurich"
     volumes:
