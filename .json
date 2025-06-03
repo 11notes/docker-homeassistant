@@ -8,7 +8,7 @@
   },
 
   "readme":{
-    "description":"Activate any version of Windows and Office, forever",
+    "description":"Run Home Assistant smaller, lightweight and more secure than ever",
     "parent":{
       "image":"11notes/alpine:stable"
     },
