@@ -1,0 +1,10 @@
+# default
+.git*
+maintain/
+LICENSE
+*.md
+img/
+node_modules/
+
+# custom
+.env

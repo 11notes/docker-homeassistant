@@ -1,0 +1,31 @@
+config:
+ssdp:
+zeroconf:
+sun:
+go2rtc:
+logbook:
+history:
+media_source:
+mobile_app:
+system_health:
+
+homeassistant:
+  packages: !include_dir_named packages
+
+http:
+  server_port: 3000
+  use_x_forwarded_for: true
+  trusted_proxies:
+    - 10.0.0.0/8
+    - 172.16.0.0/12
+    - 192.168.0.0/16
+
+recorder:
+  auto_purge: true
+  purge_keep_days: 365
+  db_url: !secret postgresuri
+
+logger:
+  default: error
+  logs:
+    homeassistant.core: error
