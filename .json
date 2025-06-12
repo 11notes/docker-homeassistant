@@ -1,23 +1,21 @@
 {
-  "image":"11notes/homeassistant",
-  "name":"homeassistant",
-  "root":"/homeassistant",
-  
-  "semver":{
-    "version":"2025.5.3"
+  "image": "11notes/homeassistant",
+  "name": "homeassistant",
+  "root": "/homeassistant",
+  "semver": {
+    "version": "2025.6.0"
   },
-
-  "readme":{
-    "description":"Run Home Assistant smaller, lightweight and more secure than ever",
-    "parent":{
-      "image":"11notes/alpine:stable"
+  "readme": {
+    "description": "Run Home Assistant smaller, lightweight and more secure than ever",
+    "parent": {
+      "image": "11notes/alpine:stable"
     },
-    "built":{
-      "homeassistant":"https://github.com/home-assistant/core"
+    "built": {
+      "homeassistant": "https://github.com/home-assistant/core"
     }
   },
-  "grype":{
-    "severity":"critical",
-    "fail":false
+  "grype": {
+    "severity": "critical",
+    "fail": false
   }
 }
