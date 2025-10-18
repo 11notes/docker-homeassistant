@@ -3,7 +3,7 @@
   "name": "homeassistant",
   "root": "/homeassistant",
   "semver": {
-    "version": "2025.10.2"
+    "version": "2025.10.3"
   },
   "readme": {
     "description": "Run Home Assistant smaller, lightweight and more secure than ever",
