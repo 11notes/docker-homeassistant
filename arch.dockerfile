@@ -158,7 +158,7 @@
 
 # :: MONITORING
   HEALTHCHECK --interval=5s --timeout=2s --start-period=5s \
-    CMD ["/usr/local/bin/localhealth", "http://127.0.0.1:8123/", "-I"]
+    CMD ["/usr/local/bin/localhealth", "http://127.0.0.1:8123/"]
 
 # :: EXECUTE
   USER ${APP_UID}:${APP_GID}
