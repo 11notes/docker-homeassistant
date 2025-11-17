@@ -3,15 +3,16 @@
   "name": "homeassistant",
   "root": "/homeassistant",
   "semver": {
-    "version": "2025.9.4"
+    "version": "2025.11.1"
   },
   "readme": {
-    "description": "Run Home Assistant smaller, lightweight and more secure than ever",
+    "description": "run home assistant rootless",
+    "introduction":"[Home Assistant](https://github.com/home-assistant/core) (created by [home-assistant](https://github.com/home-assistant/)) is an open source home automation that puts local control and privacy first. Powered by a worldwide community of tinkerers and DIY enthusiasts. Perfect to run on a Raspberry Pi or a local server.",
     "parent": {
       "image": "11notes/alpine:stable"
     },
     "built": {
-      "homeassistant": "https://github.com/home-assistant/core"
+      "home-assistant/core": "https://github.com/home-assistant/core"
     }
   },
   "grype": {

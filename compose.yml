@@ -1,0 +1,57 @@
+name: "iot"
+
+x-lockdown: &lockdown
+  # prevents write access to the image itself
+  read_only: true
+  # prevents any process within the container to gain more privileges
+  security_opt:
+    - "no-new-privileges=true"
+
+services:
+  postgres:
+    # for more information about this image checkout:
+    # https://github.com/11notes/docker-postgres
+    image: "11notes/postgres:17"
+    <<: *lockdown
+    environment:
+      TZ: "Europe/Zurich"
+      POSTGRES_PASSWORD: "${POSTGRES_PASSWORD}"
+    networks:
+      backend:
+    volumes:
+      - "postgres.etc:/postgres/etc"
+      - "postgres.var:/postgres/var"
+      - "postgres.backup:/postgres/backup"
+    tmpfs:
+      - "/postgres/run:uid=1000,gid=1000"
+      - "/postgres/log:uid=1000,gid=1000"
+    restart: "always"
+
+  homeassistant:
+    depends_on:
+      postgres:
+        condition: "service_healthy"
+        restart: true
+    image: "11notes/homeassistant:2025.11.1"
+    <<: *lockdown
+    environment:
+      TZ: "Europe/Zurich"
+    volumes:
+      - "homeassistant.etc:/homeassistant/etc"
+    networks:
+      frontend:
+      backend:
+    ports:
+      - "3000:8123/tcp"
+    restart: "always"
+
+volumes:
+  postgres.etc:
+  postgres.var:
+  postgres.backup:
+  homeassistant.etc:
+
+networks:
+  frontend:
+  backend:
+    internal: true

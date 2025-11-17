@@ -2,7 +2,6 @@ config:
 ssdp:
 zeroconf:
 sun:
-go2rtc:
 logbook:
 history:
 media_source:
@@ -13,7 +12,7 @@ homeassistant:
   packages: !include_dir_named packages
 
 http:
-  server_port: 3000
+  server_port: 8123
   use_x_forwarded_for: true
   trusted_proxies:
     - 10.0.0.0/8

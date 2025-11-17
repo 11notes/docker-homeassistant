@@ -1,25 +1,130 @@
 # ╔═════════════════════════════════════════════════════╗
 # ║                       SETUP                         ║
 # ╚═════════════════════════════════════════════════════╝
-  # GLOBAL
+# GLOBAL
   ARG APP_UID=1000 \
-      APP_GID=1000 \
-      PYTHON_VERSION=3.13
+      APP_GID=1000
+  ARG PYTHON_VERSION=3.13
 
-  # :: FOREIGN IMAGES
+# :: FOREIGN IMAGES
+  FROM 11notes/util:bin AS util-bin
   FROM 11notes/util AS util
+  FROM 11notes/distroless:localhealth AS distroless-localhealth
+  FROM 11notes/distroless:go2rtc AS distroless-go2rtc
+
 
 # ╔═════════════════════════════════════════════════════╗
 # ║                       BUILD                         ║
 # ╚═════════════════════════════════════════════════════╝
-  # BUILD / PYTHON
-  FROM alpine
+# :: WHEELS
+  FROM 11notes/python:wheel-${PYTHON_VERSION} AS wheels
+  ARG APP_VERSION
+  USER root
+
+  RUN set -ex; \
+    mkdir -p /pip/wheels;
+
+  RUN set -ex; \
+    pip wheel \
+      --wheel-dir /pip/wheels \
+      -f https://wheels.home-assistant.io/musllinux/ \
+      -f https://11notes.github.io/python-wheels/ \
+      homeassistant=="${APP_VERSION}";
+
+  RUN set -ex; \
+    pip wheel \
+      --wheel-dir /pip/wheels \
+      -f https://wheels.home-assistant.io/musllinux/ \
+      -f https://11notes.github.io/python-wheels/ \
+      -r https://raw.githubusercontent.com/home-assistant/core/refs/tags/${APP_VERSION}/requirements.txt;
+
+  RUN set -ex; \
+    pip wheel \
+      --wheel-dir /pip/wheels \
+      -f https://wheels.home-assistant.io/musllinux/ \
+      -f https://11notes.github.io/python-wheels/ \
+      -r https://raw.githubusercontent.com/home-assistant/core/refs/tags/${APP_VERSION}/requirements_all.txt;
+
+  RUN set -ex; \
+    pip wheel \
+      --wheel-dir /pip/wheels \
+      -f https://wheels.home-assistant.io/musllinux/ \
+      -f https://11notes.github.io/python-wheels/ \
+      -r https://raw.githubusercontent.com/home-assistant/docker/refs/heads/master/requirements.txt;
+
+# :: HOMEASSISTANT
+  FROM 11notes/python:${PYTHON_VERSION} AS build
+  COPY --from=wheels /pip/wheels /pip/wheels
+  ARG APP_VERSION
+  USER root
+
+  RUN set -ex; \
+    apk --no-cache --update add \
+      bash \
+      binutils \
+      bluez \
+      bluez-deprecated \
+      bluez-libs \
+      ca-certificates \
+      catatonit \
+      coreutils \
+      cups-libs \
+      curl \
+      eudev-libs \
+      ffmpeg \
+      git \
+      grep \
+      hwdata-usb \
+      imlib2 \
+      iperf3 \
+      iputils \
+      jq \
+      libcap \
+      libftdi1 \
+      libgpiod \
+      libturbojpeg \
+      libpulse \
+      libstdc++ \
+      libxslt \
+      libzbar \
+      mailcap \
+      mariadb-connector-c \
+      nano \
+      net-tools \
+      nmap \
+      openssh-client \
+      openssl \
+      pianobar \
+      postgresql-libs \
+      pulseaudio-alsa \
+      socat \
+      tiff \
+      tzdata \
+      unzip \
+      xz;
+
+  RUN set -ex; \
+    pip install \
+      --no-index \
+      -f /pip/wheels \
+      -r https://raw.githubusercontent.com/home-assistant/core/refs/tags/${APP_VERSION}/requirements.txt \
+      -r https://raw.githubusercontent.com/home-assistant/core/refs/tags/${APP_VERSION}/requirements_all.txt \
+      -r https://raw.githubusercontent.com/home-assistant/docker/refs/heads/master/requirements.txt \
+      homeassistant=="${APP_VERSION}"; \
+    rm -rf /pip/wheels;
+
+# :: FILE-SYSTEM
+  FROM alpine AS file-system
+  ARG APP_ROOT
+
+  RUN set -ex; \
+    mkdir -p /distroless${APP_ROOT}/etc;
 
 # ╔═════════════════════════════════════════════════════╗
 # ║                       IMAGE                         ║
 # ╚═════════════════════════════════════════════════════╝
-  # :: HEADER
-  FROM 11notes/python:${PYTHON_VERSION}
+# :: HEADER
+  FROM scratch
 
   # :: default arguments
     ARG TARGETPLATFORM \
@@ -32,16 +137,7 @@
         APP_ROOT \
         APP_UID \
         APP_GID \
-        APP_NO_CACHE \
-        PYTHON_VERSION
-
-  # :: default python image
-    ARG PIP_ROOT_USER_ACTION=ignore \
-        PIP_BREAK_SYSTEM_PACKAGES=1 \
-        PIP_DISABLE_PIP_VERSION_CHECK=1 \
-        PIP_NO_CACHE_DIR=1 \
-        UV_NO_CACHE=1 \
-        UV_SYSTEM_PYTHON=true
+        APP_NO_CACHE
 
   # :: default environment
     ENV APP_IMAGE=${APP_IMAGE} \
@@ -49,73 +145,21 @@
         APP_VERSION=${APP_VERSION} \
         APP_ROOT=${APP_ROOT}
 
-  # :: app specific environment
-    ENV LD_LIBRARY_PATH=/usr/lib
-
   # :: multi-stage
-    COPY --from=util /usr/local/bin /usr/local/bin
-    COPY --chown=${APP_UID}:${APP_GID} ./rootfs /
-
-# :: RUN
-  USER root
-  RUN eleven printenv;
-
-  # :: install dependencies
-    RUN set -ex; \
-      apk --no-cache --update --repository https://dl-cdn.alpinelinux.org/alpine/edge/community add \
-        go2rtc; \
-      apk --no-cache --update add \
-        wget \
-        bash \
-        imlib2 \
-        ffmpeg \
-        iperf3 \
-        git \
-        grep \
-        libgpiod \
-        libpulse \
-        libzbar \
-        mariadb-connector-c \
-        net-tools \
-        nmap \
-        openssh-client \
-        pianobar \
-        pulseaudio-alsa \
-        socat \
-        libturbojpeg \
-        postgresql-libs;
-
-    RUN set -ex; \
-      pip3 install uv; \
-      mkdir -p ${APP_ROOT}/etc; \
-      curl -fsSL "https://github.com/home-assistant/core/archive/${APP_VERSION}.tar.gz" | tar xzf - -C /tmp --strip-components=1; \
-      uv pip install --no-build --find-links https://wheels.home-assistant.io/musllinux/ \
-        -r /tmp/requirements.txt \
-        -r /tmp/requirements_all.txt \
-        -r https://raw.githubusercontent.com/home-assistant/docker/refs/heads/master/requirements.txt \
-        homeassistant=="${APP_VERSION}"; \      
-      rm -rf /tmp/*; \
-      chmod +x -R /usr/local/bin; \
-      chown -R ${APP_UID}:${APP_GID} \
-        ${APP_ROOT}; \
-      apk --no-cache --update --virtual .build add \
-        libcap; \
-      setcap 'cap_net_bind_service=+ep' "/usr/local/bin/python${PYTHON_VERSION}"; \
-      apk del --no-network .build;
-
-    RUN set -ex; \
-      # CVE-2025-43859
-      pip3 install h11 --upgrade; \
-      # CVE-2024-28397
-      pip3 install js2py --upgrade;
+    COPY --from=distroless-localhealth / /
+    COPY --from=distroless-go2rtc / /
+    COPY --from=util / /
+    COPY --from=build / /
+    COPY --from=file-system --chown=${APP_UID}:${APP_GID} /distroless/ /
+    COPY --chown=${APP_UID}:${APP_GID} ./rootfs/ /
 
 # :: PERSISTENT DATA
   VOLUME ["${APP_ROOT}/etc"]
 
-# :: HEALTH
-  HEALTHCHECK --interval=5s --timeout=2s --start-interval=5s \
-    CMD ["/usr/bin/curl", "-X", "GET", "-kILs", "--fail", "http://localhost:3000/"]
+# :: MONITORING
+  HEALTHCHECK --interval=5s --timeout=2s --start-period=5s \
+    CMD ["/usr/local/bin/localhealth", "http://127.0.0.1:8123/", "-I"]
 
 # :: EXECUTE
   USER ${APP_UID}:${APP_GID}
-  ENTRYPOINT ["/sbin/tini", "--", "/usr/local/bin/entrypoint.sh"]
+  ENTRYPOINT ["/usr/local/bin/tini", "--", "python", "-m", "homeassistant", "--config", "/homeassistant/etc"]
