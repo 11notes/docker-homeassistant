@@ -146,4 +146,4 @@ docker pull quay.io/11notes/homeassistant:2025.11.2
 # ElevenNotes™️
 This image is provided to you at your own risk. Always make backups before updating an image to a different version. Check the [releases](https://github.com/11notes/docker-homeassistant/releases) for breaking changes. If you have any problems with using this image simply raise an [issue](https://github.com/11notes/docker-homeassistant/issues), thanks. If you have a question or inputs please create a new [discussion](https://github.com/11notes/docker-homeassistant/discussions) instead of an issue. You can find all my other repositories on [github](https://github.com/11notes?tab=repositories).
 
-*created 18.11.2025, 08:21:15 (CET)*
+*created 18.11.2025, 11:23:38 (CET)*
