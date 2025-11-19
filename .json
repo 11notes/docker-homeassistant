@@ -1,5 +1,6 @@
 {
   "image": "11notes/homeassistant",
+  "platform":"amd64,arm64",
   "name": "homeassistant",
   "root": "/homeassistant",
   "semver": {
