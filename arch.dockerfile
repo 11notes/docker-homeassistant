@@ -16,45 +16,8 @@
 # ╔═════════════════════════════════════════════════════╗
 # ║                       BUILD                         ║
 # ╚═════════════════════════════════════════════════════╝
-# :: WHEELS
-  FROM 11notes/python:wheel-${PYTHON_VERSION} AS wheels
-  ARG APP_VERSION
-  USER root
-
-  RUN set -ex; \
-    mkdir -p /pip/wheels;
-
-  RUN set -ex; \
-    pip wheel \
-      --wheel-dir /pip/wheels \
-      -f https://wheels.home-assistant.io/musllinux/ \
-      -f https://11notes.github.io/python-wheels/ \
-      homeassistant=="${APP_VERSION}";
-
-  RUN set -ex; \
-    pip wheel \
-      --wheel-dir /pip/wheels \
-      -f https://wheels.home-assistant.io/musllinux/ \
-      -f https://11notes.github.io/python-wheels/ \
-      -r https://raw.githubusercontent.com/home-assistant/core/refs/tags/${APP_VERSION}/requirements.txt;
-
-  RUN set -ex; \
-    pip wheel \
-      --wheel-dir /pip/wheels \
-      -f https://wheels.home-assistant.io/musllinux/ \
-      -f https://11notes.github.io/python-wheels/ \
-      -r https://raw.githubusercontent.com/home-assistant/core/refs/tags/${APP_VERSION}/requirements_all.txt;
-
-  RUN set -ex; \
-    pip wheel \
-      --wheel-dir /pip/wheels \
-      -f https://wheels.home-assistant.io/musllinux/ \
-      -f https://11notes.github.io/python-wheels/ \
-      -r https://raw.githubusercontent.com/home-assistant/docker/refs/heads/master/requirements.txt;
-
 # :: HOMEASSISTANT
   FROM 11notes/python:${PYTHON_VERSION} AS build
-  COPY --from=wheels /pip/wheels /pip/wheels
   ARG APP_VERSION
   USER root
 
@@ -105,13 +68,13 @@
 
   RUN set -ex; \
     pip install \
-      --no-index \
-      -f /pip/wheels \
+      --only-binary=:all: \
+      -f https://wheels.home-assistant.io/musllinux/ \
+      -f https://11notes.github.io/python-wheels/ \
       -r https://raw.githubusercontent.com/home-assistant/core/refs/tags/${APP_VERSION}/requirements.txt \
       -r https://raw.githubusercontent.com/home-assistant/core/refs/tags/${APP_VERSION}/requirements_all.txt \
       -r https://raw.githubusercontent.com/home-assistant/docker/refs/heads/master/requirements.txt \
-      homeassistant=="${APP_VERSION}"; \
-    rm -rf /pip/wheels;
+      homeassistant=="${APP_VERSION}";
 
 # :: FILE-SYSTEM
   FROM alpine AS file-system
