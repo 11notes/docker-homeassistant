@@ -18,6 +18,7 @@
 # ╚═════════════════════════════════════════════════════╝
 # :: HOMEASSISTANT
   FROM 11notes/python:${PYTHON_VERSION} AS build
+  COPY ./rootfs/usr /usr
   ARG APP_VERSION
   USER root
 
@@ -81,7 +82,11 @@
       -r ./requirements_all.txt \
       -r ./requirements.txt \
       -r ./requirements.docker.txt \
-      homeassistant=="${APP_VERSION}";
+      homeassistant=="${APP_VERSION}"; \
+    rm -rf /build;
+
+  RUN set -ex; \
+    chmod +x -R /usr/local/bin;
 
 # :: FILE-SYSTEM
   FROM alpine AS file-system
@@ -121,7 +126,7 @@
     COPY --from=util / /
     COPY --from=build / /
     COPY --from=file-system --chown=${APP_UID}:${APP_GID} /distroless/ /
-    COPY --chown=${APP_UID}:${APP_GID} ./rootfs/ /
+    COPY --chown=${APP_UID}:${APP_GID} ./rootfs/homeassistant /homeassistant
 
 # :: PERSISTENT DATA
   VOLUME ["${APP_ROOT}/etc"]
@@ -132,4 +137,4 @@
 
 # :: EXECUTE
   USER ${APP_UID}:${APP_GID}
-  ENTRYPOINT ["/usr/local/bin/tini", "--", "python", "-m", "homeassistant", "--config", "/homeassistant/etc"]
+  ENTRYPOINT ["/usr/local/bin/tini", "--", "/usr/local/bin/entrypoint.sh"]
