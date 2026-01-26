@@ -4,7 +4,7 @@
 # GLOBAL
   ARG APP_UID=1000 \
       APP_GID=1000
-  ARG PYTHON_VERSION=3.14
+  ARG PYTHON_VERSION=0
 
 # :: FOREIGN IMAGES
   FROM 11notes/util:bin AS util-bin
@@ -67,13 +67,20 @@
       xz;
 
   RUN set -ex; \
-    pip install \
+    mkdir -p /build/homeassistant; \
+    cd /build; \
+    curl -sL https://raw.githubusercontent.com/home-assistant/core/refs/tags/${APP_VERSION}/homeassistant/package_constraints.txt > ./homeassistant/package_constraints.txt; \
+    curl -sL https://raw.githubusercontent.com/home-assistant/core/refs/tags/${APP_VERSION}/requirements_all.txt > ./requirements_all.txt; \
+    curl -sL https://raw.githubusercontent.com/home-assistant/core/refs/tags/${APP_VERSION}/requirements.txt > ./requirements.txt; \
+    curl -sL https://raw.githubusercontent.com/home-assistant/docker/refs/heads/master/requirements.txt > ./requirements.docker.txt; \
+    uv pip install \
       --only-binary=:all: \
       -f https://wheels.home-assistant.io/musllinux/ \
       -f https://11notes.github.io/python-wheels/ \
-      -r https://raw.githubusercontent.com/home-assistant/core/refs/tags/${APP_VERSION}/requirements.txt \
-      -r https://raw.githubusercontent.com/home-assistant/core/refs/tags/${APP_VERSION}/requirements_all.txt \
-      -r https://raw.githubusercontent.com/home-assistant/docker/refs/heads/master/requirements.txt \
+      -c ./homeassistant/package_constraints.txt \
+      -r ./requirements_all.txt \
+      -r ./requirements.txt \
+      -r ./requirements.docker.txt \
       homeassistant=="${APP_VERSION}";
 
 # :: FILE-SYSTEM
