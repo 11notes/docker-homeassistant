@@ -47,7 +47,14 @@ jobs:
               const { inspect } = require('node:util');
               const { existsSync, readFileSync, writeFileSync } = require('node:fs');
               const { resolve } = require('node:path');
-              const semver = require('semver')
+              const semver = require('semver');
+
+              const semverExceptions = (s) => {
+                switch('${{ github.event.repository.name }}'){
+                  case 'docker-chrony': core.warning(`semver exception found for chrony version ${s}, setting version to major.minor`); return(s.split('.').slice(0, 2).join('.'));
+                }
+                return(s);
+              }
 
               // defaults
               const json = `${{ toJSON(github.event.inputs) }}`;
@@ -91,8 +98,8 @@ jobs:
               }
 
               // semver
-              const latest = semver.valid(semver.coerce(job.inputs.version));
-              const current = semver.valid(semver.coerce(job.json.semver.version));
+              const latest = semverExceptions(semver.valid(semver.coerce(job.inputs.version)));
+              const current = semverExceptions(semver.valid(semver.coerce(job.json.semver.version)));
               const tag = semver.valid(semver.coerce(job.inputs.tag));
               const checks = {latestTagExists:true};
 
