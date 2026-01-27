@@ -23,7 +23,6 @@ run home assistant rootless
 >* ... this image runs read-only
 >* ... this image is automatically scanned for CVEs before and after publishing
 >* ... this image is created via a secure and pinned CI/CD process
->* ... this image is very small
 
 If you value security, simplicity and optimizations to the extreme, then this image might be for you.
 
@@ -145,4 +144,4 @@ docker pull quay.io/11notes/homeassistant:2026.1.3
 # ElevenNotes™️
 This image is provided to you at your own risk. Always make backups before updating an image to a different version. Check the [releases](https://github.com/11notes/docker-homeassistant/releases) for breaking changes. If you have any problems with using this image simply raise an [issue](https://github.com/11notes/docker-homeassistant/issues), thanks. If you have a question or inputs please create a new [discussion](https://github.com/11notes/docker-homeassistant/discussions) instead of an issue. You can find all my other repositories on [github](https://github.com/11notes?tab=repositories).
 
-*created 26.01.2026, 12:15:20 (CET)*
+*created 26.01.2026, 21:23:15 (CET)*
