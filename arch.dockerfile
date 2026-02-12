@@ -18,7 +18,6 @@
 # ╚═════════════════════════════════════════════════════╝
 # :: HOMEASSISTANT
   FROM 11notes/python:${PYTHON_VERSION} AS build
-  COPY ./rootfs/usr /usr
   ARG APP_VERSION
   USER root
 
@@ -85,8 +84,15 @@
       homeassistant=="${APP_VERSION}"; \
     rm -rf /build;
 
+# :: ENTRYPOINT
+  FROM 11notes/go:1.25 AS entrypoint
+  COPY ./build /
+
   RUN set -ex; \
-    chmod +x -R /usr/local/bin;
+    cd /go/entrypoint; \
+    eleven go build entrypoint main.go; \
+    eleven distroless entrypoint;
+
 
 # :: FILE-SYSTEM
   FROM alpine AS file-system
@@ -125,8 +131,9 @@
     COPY --from=distroless-go2rtc / /
     COPY --from=util / /
     COPY --from=build / /
+    COPY --from=entrypoint /distroless/ /
     COPY --from=file-system --chown=${APP_UID}:${APP_GID} /distroless/ /
-    COPY --chown=${APP_UID}:${APP_GID} ./rootfs/homeassistant /homeassistant
+    COPY --chown=${APP_UID}:${APP_GID} ./rootfs /
 
 # :: PERSISTENT DATA
   VOLUME ["${APP_ROOT}/etc"]
@@ -137,4 +144,4 @@
 
 # :: EXECUTE
   USER ${APP_UID}:${APP_GID}
-  ENTRYPOINT ["/usr/local/bin/tini", "--", "/usr/local/bin/entrypoint.sh"]
+  ENTRYPOINT ["/usr/local/bin/entrypoint"]
