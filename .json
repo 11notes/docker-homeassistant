@@ -4,7 +4,7 @@
   "name": "homeassistant",
   "root": "/homeassistant",
   "semver": {
-    "version": "2026.2.1"
+    "version": "2026.2.2"
   },
   "readme": {
     "description": "run home assistant rootless",
