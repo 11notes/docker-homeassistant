@@ -68,6 +68,11 @@
       xz;
 
   RUN set -ex; \
+    pip install \
+      -f https://11notes.github.io/python-wheels/ \
+      uv;
+
+  RUN set -ex; \
     mkdir -p /build/homeassistant; \
     cd /build; \
     curl -sL https://raw.githubusercontent.com/home-assistant/core/refs/tags/${APP_VERSION}/homeassistant/package_constraints.txt > ./homeassistant/package_constraints.txt; \
