@@ -23,6 +23,7 @@ run home assistant rootless
 >* ... this image runs read-only
 >* ... this image is automatically scanned for CVEs before and after publishing
 >* ... this image is created via a secure and pinned CI/CD process
+>* ... this image runs a basic integration test before it will be published (or not if it fails)
 
 If you value security, simplicity and optimizations to the extreme, then this image might be for you.
 
@@ -71,6 +72,9 @@ services:
       TZ: "Europe/Zurich"
     volumes:
       - "homeassistant.etc:/homeassistant/etc"
+    tmpfs:
+      # needed for read-only and UV caching
+      - "/homeassistant/tmp:uid=1000,gid=1000"
     networks:
       frontend:
       backend:
@@ -152,4 +156,4 @@ This image supports nobody by default. Simply add **-nobody** to any tag and the
 # ElevenNotes™️
 This image is provided to you at your own risk. Always make backups before updating an image to a different version. Check the [releases](https://github.com/11notes/docker-homeassistant/releases) for breaking changes. If you have any problems with using this image simply raise an [issue](https://github.com/11notes/docker-homeassistant/issues), thanks. If you have a question or inputs please create a new [discussion](https://github.com/11notes/docker-homeassistant/discussions) instead of an issue. You can find all my other repositories on [github](https://github.com/11notes?tab=repositories).
 
-*created 23.05.2026, 09:43:25 (CET)*
+*created 27.05.2026, 23:43:59 (CET)*
