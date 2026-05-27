@@ -38,6 +38,9 @@ services:
       TZ: "Europe/Zurich"
     volumes:
       - "homeassistant.etc:/homeassistant/etc"
+    tmpfs:
+      # needed for read-only and UV caching
+      - "/homeassistant/tmp:uid=1000,gid=1000"
     networks:
       frontend:
       backend:

@@ -61,6 +61,7 @@
       pianobar \
       postgresql-libs \
       pulseaudio-alsa \
+      ffmpeg-libavdevice \
       socat \
       tiff \
       tzdata \
@@ -69,7 +70,6 @@
 
   RUN set -ex; \
     pip install \
-      -f https://11notes.github.io/python-wheels/ \
       uv;
 
   RUN set -ex; \
@@ -105,7 +105,8 @@
   ARG APP_ROOT
 
   RUN set -ex; \
-    mkdir -p /distroless${APP_ROOT}/etc;
+    mkdir -p /distroless${APP_ROOT}/etc; \
+    mkdir -p /distroless${APP_ROOT}/tmp;
 
 # ╔═════════════════════════════════════════════════════╗
 # ║                       IMAGE                         ║
@@ -131,6 +132,9 @@
         APP_NAME=${APP_NAME} \
         APP_VERSION=${APP_VERSION} \
         APP_ROOT=${APP_ROOT}
+
+  # :: app specific environment
+    ENV UV_CACHE_DIR=${APP_ROOT}/tmp
 
   # :: multi-stage
     COPY --from=distroless-localhealth / /
