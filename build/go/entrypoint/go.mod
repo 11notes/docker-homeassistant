@@ -1,5 +1,5 @@
-go 1.25
+go 1.26
 module github.com/11notes/docker-homeassistant
 require (
-  github.com/11notes/go-eleven v0.2.0
+  github.com/11notes/go-eleven v0.4.4
 )
