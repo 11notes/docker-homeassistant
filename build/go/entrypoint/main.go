@@ -15,9 +15,5 @@ func main() {
 		}
 	}
 
-	if err := os.Symlink("/proc/self/fd/1", "/homeassistant/etc/home-assistant.log"); err != nil {
-		eleven.LogFatal("could not redirect log to stdout")
-	}
-
-	eleven.Container.Run("/usr/local/bin", "python", []string{"-m", "homeassistant", "--config", "/homeassistant/etc"})
+	eleven.Container.Run("/usr/local/bin", "python", []string{"-m", "homeassistant", "--config", "/homeassistant/etc"}, []string{})
 }
