@@ -82,7 +82,7 @@
     uv pip install \
       --only-binary=:all: \
       -f https://wheels.home-assistant.io/musllinux/ \
-      -f https://11notes.github.io/python-wheels/ \
+      -f https://wheels.11notes.dev/ \
       -c ./homeassistant/package_constraints.txt \
       -r ./requirements_all.txt \
       -r ./requirements.txt \
@@ -134,7 +134,8 @@
         APP_ROOT=${APP_ROOT}
 
   # :: app specific environment
-    ENV UV_CACHE_DIR=${APP_ROOT}/tmp
+    ENV UV_CACHE_DIR=${APP_ROOT}/tmp \
+        HA_DISABLE_LOG_FILE=1
 
   # :: multi-stage
     COPY --from=distroless-localhealth / /
