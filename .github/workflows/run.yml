@@ -39,7 +39,6 @@ jobs:
         uses: 11notes/actions/update@v1 # v1
         with:
           latest: ${{ env.LATEST_VERSION }}
-          build: ${{ env.LATEST_BUILD }}
 
       - name: call org.update
         if: env.ACTIONS_UPDATE == 'true'
