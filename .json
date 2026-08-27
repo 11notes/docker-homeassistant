@@ -19,5 +19,7 @@
   "grype": {
     "severity": "critical",
     "fail": false
-  }
+  },
+  "unraid": true,
+  "nobody": true
 }
