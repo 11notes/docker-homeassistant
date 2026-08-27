@@ -20,6 +20,7 @@ services:
       POSTGRES_PASSWORD: "${POSTGRES_PASSWORD}"
     volumes:
       - "homeassistant.etc:/homeassistant/etc"
+      - "homeassistant.var:/homeassistant/var"
     tmpfs:
       # needed for read-only and UV caching
       - "/homeassistant/tmp:uid=1000,gid=1000"
@@ -51,6 +52,7 @@ services:
 
 volumes:
   homeassistant.etc:
+  homeassistant.var:
   postgres.etc:
   postgres.var:
   postgres.backup:

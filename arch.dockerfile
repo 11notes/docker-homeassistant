@@ -106,6 +106,7 @@
 
   RUN set -ex; \
     mkdir -p /distroless${APP_ROOT}/etc; \
+    mkdir -p /distroless${APP_ROOT}/var; \
     mkdir -p /distroless${APP_ROOT}/tmp;
 
 # ╔═════════════════════════════════════════════════════╗
@@ -135,6 +136,7 @@
 
   # :: app specific environment
     ENV UV_CACHE_DIR=${APP_ROOT}/tmp \
+        PYTHONUSERBASE=${APP_ROOT}/var \
         HA_DISABLE_LOG_FILE=1
 
   # :: multi-stage
@@ -147,7 +149,7 @@
     COPY --chown=${APP_UID}:${APP_GID} ./rootfs /
 
 # :: PERSISTENT DATA
-  VOLUME ["${APP_ROOT}/etc"]
+  VOLUME ["${APP_ROOT}/etc", "${APP_ROOT}/var"]
 
 # :: MONITORING
   HEALTHCHECK --interval=5s --timeout=2s --start-period=5s \

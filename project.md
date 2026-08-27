@@ -16,6 +16,7 @@ If you value security, simplicity and optimizations to the extreme, then this im
 
 ${{ title_volumes }}
 * **${{ json_root }}/etc** - Directory of all config and custom files
+* **${{ json_root }}/var** - Directory where Homeassistant will store python packages and other integration files
 
 ${{ content_compose }}
 
